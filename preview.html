@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEON HUB</title>
+<style>
+:root {
+  --accent: #ff7900;
+  --bg: #080808;
+  --panel: #141414;
+  --text: #f7f7f7;
+  --muted: #999;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 25%, #442006 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 45%, #442006 0 2px, transparent 3px),
+    radial-gradient(circle at 65% 80%, #442006 0 2px, transparent 3px),
+    var(--bg);
+  background-size: 180px 180px, 230px 230px, 200px 200px, auto;
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+}
+header {
+  width: min(100% - 28px, 850px);
+  margin: 18px auto 0;
+  padding: 15px 20px;
+  border-radius: 22px;
+  background: #111d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.logo { color: var(--accent); font-weight: 900; font-size: 20px; }
+header a { color: white; text-decoration: none; }
+main {
+  width: min(100% - 28px, 760px);
+  margin: 85px auto 50px;
+  text-align: center;
+}
+h1 { font-size: clamp(30px, 6vw, 48px); margin-bottom: 12px; }
+.subtitle { color: var(--muted); margin-bottom: 32px; }
+.shortcuts {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.shortcut {
+  width: 65px;
+  height: 65px;
+  border: 1px solid #292929;
+  border-radius: 17px;
+  background: #171717;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
+}
+.shortcut:hover, .game:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.search {
+  display: flex;
+  gap: 8px;
+  padding: 7px;
+  border: 2px solid #222;
+  background: #101010;
+  border-radius: 40px;
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 17px;
+  background: transparent;
+  color: white;
+  border: 0;
+  outline: none;
+  font-size: 16px;
+}
+button, input, select { font: inherit; }
+.btn {
+  background: var(--accent);
+  color: #111;
+  font-weight: 750;
+  border: 0;
+  border-radius: 28px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.categories {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0;
+}
+.categories button {
+  border: 1px solid #333;
+  background: #151515;
+  color: white;
+  border-radius: 20px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.categories button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 12px;
+  text-align: left;
+}
+.games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  text-align: left;
+}
+.game {
+  background: #121212;
+  border: 1px solid #292929;
+  padding: 17px;
+  border-radius: 16px;
+  transition: .15s;
+  overflow-wrap: anywhere;
+}
+.game h3 { margin: 0 0 8px; font-size: 16px; }
+.game p { color: var(--muted); font-size: 13px; }
+.game a { color: var(--accent); text-decoration: none; }
+.game .fav {
+  float: right;
+  color: white;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 19px;
+}
+.add-panel {
+  margin-top: 35px;
+  padding: 20px;
+  border-radius: 18px;
+  background: #111;
+  text-align: left;
+}
+.add-panel h2 { font-size: 18px; }
+.add-panel input, .add-panel select {
+  width: 100%;
+  padding: 11px;
+  margin: 6px 0 12px;
+  background: #1b1b1b;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 9px;
+}
+footer { padding: 25px; text-align: center; color: #777; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ NEON HUB</div>
+  <a href="#games">🎮 ゲーム一覧</a>
+  <a href="#add">＋ リンク追加</a>
+</header>
+
+<main>
+  <h1>neon hub</h1>
+  <p class="subtitle">your own corner of the internet.</p>
+
+  <div class="shortcuts">
+    <button class="shortcut" title="ゲーム一覧"
+      onclick="document.querySelector('#games').scrollIntoView()">
+      🎮
+    </button>
+    <button class="shortcut" title="お気に入り"
+      onclick="showFavorites()">★</button>
+    <button class="shortcut" title="リンク追加"
+      onclick="document.querySelector('#add').scrollIntoView()">＋</button>
+  </div>
+
+  <form class="search" id="searchForm">
+    <input id="searchInput" placeholder="search anything..."
+      aria-label="ゲームを検索">
+    <button class="btn">検索</button>
+  </form>
+
+  <div class="categories">
+    <button class="active" data-cat="すべて">すべて</button>
+    <button data-cat="ゲーム">ゲーム</button>
+    <button data-cat="タイピング">タイピング</button>
+    <button data-cat="その他">その他</button>
+    <button data-cat="お気に入り">★ お気に入り</button>
+  </div>
+
+  <div class="section-title" id="games">
+    <h2>ゲーム・リンク</h2>
+    <span id="count"></span>
+  </div>
+  <div class="games" id="gameList"></div>
+
+  <section class="add-panel" id="add">
+    <h2>＋ 自分のリンクを追加</h2>
+    <form id="addForm">
+      <label for="linkName">サイト名</label>
+      <input id="linkName" required maxlength="60"
+        placeholder="例：お気に入りのゲーム">
+
+      <label for="linkUrl">URL（https:// から）</label>
+      <input id="linkUrl" type="url" required
+        placeholder="https://example.com">
+
+      <label for="linkCat">カテゴリ</label>
+      <select id="linkCat">
+        <option>ゲーム</option>
+        <option>タイピング</option>
+        <option>その他</option>
+      </select>
+      <button class="btn">リンクを登録</button>
+    </form>
+    <p style="color:#999;font-size:12px">
+      登録内容はこのブラウザ内に保存されます。
+    </p>
+  </section>
+</main>
+
+<footer>NEON HUB · Personal game portal</footer>
+
+<script>
+const starter = [
+  {
+    name: "タイピングコロシアム",
+    url: "https://typingerz.com/colosseum",
+    cat: "タイピング"
+  }
+];
+
+let custom = [];
+let favorites = [];
+let category = "すべて";
+let query = "";
+let onlyFavorites = false;
+
+try {
+  custom = JSON.parse(localStorage.getItem("neon-links") || "[]");
+  favorites = JSON.parse(localStorage.getItem("neon-favs") || "[]");
+  if (!Array.isArray(custom)) custom = [];
+  if (!Array.isArray(favorites)) favorites = [];
+} catch {
+  custom = [];
+  favorites = [];
+}
+
+function allGames() {
+  return [...starter, ...custom];
+}
+
+function save() {
+  try {
+    localStorage.setItem("neon-links", JSON.stringify(custom));
+    localStorage.setItem("neon-favs", JSON.stringify(favorites));
+  } catch {
+    alert("保存できませんでした。ブラウザの設定を確認してね。");
+  }
+}
+
+function render() {
+  const filtered = allGames().filter(game => {
+    const matchesText =
+      (game.name + " " + game.cat).toLowerCase()
+      .includes(query.toLowerCase());
+
+    const matchesCategory =
+      category === "すべて" ||
+      (category === "お気に入り"
+        ? favorites.includes(game.url)
+        : game.cat === category);
+
+    return matchesText && matchesCategory;
+  });
+
+  document.querySelector("#count").textContent =
+    filtered.length + " 件";
+
+  const list = document.querySelector("#gameList");
+  list.replaceChildren();
+
+  if (!filtered.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "見つからなかったよ。別の言葉で検索してみてね。";
+    list.append(empty);
+    return;
+  }
+
+  filtered.forEach(game => {
+    const card = document.createElement("article");
+    card.className = "game";
+
+    const fav = document.createElement("button");
+    fav.className = "fav";
+    fav.textContent = favorites.includes(game.url) ? "★" : "☆";
+    fav.setAttribute("aria-label", "お気に入り切り替え");
+    fav.onclick = () => {
+      favorites = favorites.includes(game.url)
+        ? favorites.filter(url => url !== game.url)
+        : [...favorites, game.url];
+      save();
+      render();
+    };
+
+    const title = document.createElement("h3");
+    title.textContent = game.name;
+    card.append(fav, title);
+
+    const desc = document.createElement("p");
+    desc.textContent = game.cat;
+    card.append(desc);
+
+    const link = document.createElement("a");
+    link.textContent = "サイトを開く ↗";
+    link.href = game.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    card.append(link);
+
+    list.append(card);
+  });
+}
+
+document.querySelector("#searchForm").onsubmit = event => {
+  event.preventDefault();
+  query = document.querySelector("#searchInput").value.trim();
+  render();
+};
+
+document.querySelectorAll(".categories button").forEach(button => {
+  button.onclick = () => {
+    category = button.dataset.cat;
+    document.querySelectorAll(".categories button")
+      .forEach(b => b.classList.toggle("active", b === button));
+    render();
+  };
+});
+
+function showFavorites() {
+  category = "お気に入り";
+  document.querySelectorAll(".categories button").forEach(button => {
+    button.classList.toggle("active",
+      button.dataset.cat === "お気に入り");
+  });
+  document.querySelector("#games").scrollIntoView();
+  render();
+}
+
+document.querySelector("#addForm").onsubmit = event => {
+  event.preventDefault();
+
+  const name = document.querySelector("#linkName").value.trim();
+  const url = document.querySelector("#linkUrl").value.trim();
+  const cat = document.querySelector("#linkCat").value;
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" &&
+        parsed.protocol !== "http:") {
+      alert("http または https のURLを入力してね。");
+      return;
+    }
+  } catch {
+    alert("正しいURLを入力してね。");
+    return;
+  }
+
+  if (allGames().some(game => game.url === url)) {
+    alert("このURLは登録済みだよ。");
+    return;
+  }
+
+  custom.push({ name, url, cat });
+  save();
+  event.target.reset();
+  category = "すべて";
+  query = "";
+  document.querySelector("#searchInput").value = "";
+  document.querySelectorAll(".categories button")
+    .forEach(b => b.classList.toggle("active",
+      b.dataset.cat === "すべて"));
+  render();
+  alert("リンクを登録したよ！");
+};
+
+render();
+</script>
+</body>
+</html>
